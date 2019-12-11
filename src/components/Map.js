@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {YMaps, Map as YMap, Placemark} from 'react-yandex-maps';
+import {YMaps, Map as YMap, Placemark, Polyline} from 'react-yandex-maps';
 
 const Map = (props) => {
     const {items} = props;
@@ -15,18 +15,26 @@ const Map = (props) => {
         zoom: 10, 
         controls: ['zoomControl']
     };
+    const plGeometry = items.map(item => item.point);
 
     return <YMaps query={ymQuery}>
-                <YMap state={mState} width="">
-                    {items.map((item) => {
-                        return <Placemark
-                                    key={item.id}
-                                    defaultGeometry={item.point}
-                                    properties={{
-                                        balloonContentBody: item.title,
-                                    }}
-                                />
-                    })}
+                <YMap state={mState} width="" height={600}>
+                    {items.map((item) => <Placemark
+                                            key={item.id}
+                                            defaultGeometry={item.point}
+                                            properties={{
+                                                balloonContentBody: item.title,
+                                            }}
+                                        />
+                    )}
+                    <Polyline
+                        geometry={plGeometry}
+                        options={{
+                            balloonCloseButton: false,
+                            strokeColor: '#ff0000',
+                            strokeWidth: 2
+                        }}
+                        />
                 </YMap>
     </YMaps>;
 }
