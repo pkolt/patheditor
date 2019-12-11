@@ -9,7 +9,7 @@ const PointSearch = (props) => {
                 }}>
                <input className="form-control" 
                       type="text" 
-                      placeholder="Новая точка маршрута" 
+                      placeholder="Введите новую точку маршрута и нажмите Enter" 
                       value={value}
                       onChange={(e) => onChange(e.target.value)}/>
            </form>;
