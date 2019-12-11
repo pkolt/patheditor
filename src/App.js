@@ -43,6 +43,12 @@ function App() {
     }
   }, [value]);
 
+  const onChangePoint = useCallback((id, point) => {
+    setItems(prevItems => {
+      return prevItems.map(item => item.id === id ? {...item, point} : item);
+    })
+  }, []);
+
   return <div className="container mt-5">
           <div className="row">
             <div className="col-sm">
@@ -50,7 +56,7 @@ function App() {
               <PointList items={items} onRemove={onRemove}/>
             </div>
             <div className="col-sm">
-              <Map items={items}/>
+              <Map items={items} onChangePoint={onChangePoint}/>
             </div>
           </div>
         </div>;
