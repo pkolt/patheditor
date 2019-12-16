@@ -3,15 +3,13 @@ import PropTypes from 'prop-types';
 import {YMaps, Map as YMap, Placemark, Polyline} from 'react-yandex-maps';
 
 const Map = (props) => {
-    const {items, onChangePoint} = props;
+    const {centerPoint, items, onChangeItemPoint} = props;
     const ymQuery = {
         ns: 'use-load-option',
         load: 'Map,Placemark,control.ZoomControl,geoObject.addon.balloon',
     };
-    const moscowPoint = [55.75, 37.57];
-    const firstPoint = items[0] && items[0].point;
     const mState = {
-        center: firstPoint || moscowPoint, 
+        center: centerPoint, 
         zoom: 10, 
         controls: ['zoomControl']
     };
@@ -26,7 +24,7 @@ const Map = (props) => {
                                             properties={{balloonContentHeader: item.title}}
                                             onDragEnd={(event) => {
                                                 const point = event.get('target').geometry.getCoordinates();
-                                                onChangePoint(item.id, point);
+                                                onChangeItemPoint(item.id, point);
                                             }}
                                         />
                     )}
@@ -43,13 +41,9 @@ const Map = (props) => {
 }
 
 Map.propTypes = {
-    items: PropTypes.array,
-    onChangePoint: PropTypes.func
-};
-
-Map.defaultProps = {
-    items: [],
-    onChangePoint: () => {}
+    items: PropTypes.array.isRequired,
+    onChangeItemPoint: PropTypes.func.isRequired,
+    centerPoint: PropTypes.array.isRequired
 };
 
 export default React.memo(Map);

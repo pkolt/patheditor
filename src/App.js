@@ -1,62 +1,70 @@
-import React, {useState, useCallback, useEffect} from 'react';
+import React, {useState, useMemo, useEffect, useCallback} from 'react';
 import uuid from 'uuid/v1';
-import PointSearch from './components/PointSearch';
-import PointList from './components/PointList';
+import SearchForm from './components/SearchForm';
+import List from './components/List';
 import Map from './components/Map';
 import {searchPoint} from './util';
 
 function App() {
-  const key = 'path-editor';
-  const getItemsLocalStorage = () => localStorage.getItem(key) && JSON.parse(localStorage.getItem(key));
-  const setItemsLocalStorage = (value) => localStorage.setItem(key, JSON.stringify(value));
-  const initialItems = () => getItemsLocalStorage() || [];
-  
-  const [items, setItems] = useState(initialItems);
-  const [value, setValue] = useState('');
+  const moscowPoint = [55.75, 37.57];
+  const localStorageKey = 'path-editor';
+  const getItemsLocalStorage = () => localStorage.getItem(localStorageKey) && JSON.parse(localStorage.getItem(localStorageKey));
+  const setItemsLocalStorage = (value) => localStorage.setItem(localStorageKey, JSON.stringify(value));
+
+  const [searchValue, setSearchValue] = useState('');
+  const [activeItemId, setActiveItemId] = useState('');
+  const [items, setItems] = useState(getItemsLocalStorage());
+
+  const centerPoint = useMemo(() => {
+    const activeItem = items.filter(item => item.id === activeItemId)[0];
+    const firstItem = items[0];
+    return (activeItem && activeItem.point) || (firstItem && firstItem.point) || moscowPoint;
+  }, [items, activeItemId]);
+
 
   useEffect(() => {
     setItemsLocalStorage(items);
   }, [items]);
 
-  const onRemove = useCallback((id) => {
-    setItems(items.filter((item) => item.id !== id));
-  }, [items]); 
+  const onRemoveItem = useCallback((id) => {
+    setItems(prevItems => prevItems.filter(item => item.id !== id));
+  }, []);
 
-  const onChange = useCallback(setValue, [value]);
+  const onChangeSearchValue = useCallback((value) => {
+    setSearchValue(value);
+  }, []);
 
   const onSubmit = useCallback(async () => {
-    if (value) {
-      const point = await searchPoint(value);
+    if (searchValue) {
+      const point = await searchPoint(searchValue);
       if (point) {
-        setItems(prevItems => {
-          return [
-            {
-              id: uuid(),
-              title: value,
-              point
-            },
-            ...prevItems
-          ]
-        });
-        setValue('');
+        setItems(prevItems => [
+          {
+            id: uuid(),
+            title: searchValue,
+            point
+          },
+          ...prevItems
+        ]);
+        setSearchValue('');
       }
     }
-  }, [value]);
+  }, [searchValue]);
 
-  const onChangePoint = useCallback((id, point) => {
-    setItems(prevItems => {
-      return prevItems.map(item => item.id === id ? {...item, point} : item);
-    })
+  const onChangeItemPoint = useCallback((id, point) => {
+    setItems(prevItems => prevItems.map(item => item.id === id ? {...item, point} : item));
   }, []);
+
+  const onChangeActiveItem = useCallback((id) => setActiveItemId(id), []);
 
   return <div className="container mt-5">
           <div className="row">
             <div className="col-sm">
-              <PointSearch value={value} onChange={onChange} onSubmit={onSubmit}/>
-              <PointList items={items} onRemove={onRemove}/>
+              <SearchForm value={searchValue} onChangeValue={onChangeSearchValue} onSubmit={onSubmit}/>
+              <List items={items} onRemove={onRemoveItem} onClick={onChangeActiveItem}/>
             </div>
             <div className="col-sm">
-              <Map items={items} onChangePoint={onChangePoint}/>
+              <Map centerPoint={centerPoint} items={items} onChangeItemPoint={onChangeItemPoint}/>
             </div>
           </div>
         </div>;
