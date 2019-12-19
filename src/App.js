@@ -5,12 +5,12 @@ import List from './components/List';
 import Map from './components/Map';
 import {searchPoint} from './util';
 
-function App() {
-  const moscowPoint = [55.75, 37.57];
-  const localStorageKey = 'path-editor';
-  const getItemsLocalStorage = () => localStorage.getItem(localStorageKey) && JSON.parse(localStorage.getItem(localStorageKey));
-  const setItemsLocalStorage = (value) => localStorage.setItem(localStorageKey, JSON.stringify(value));
+const moscowPoint = [55.75, 37.57];
+const localStorageKey = 'path-editor';
+const getItemsLocalStorage = () => localStorage.getItem(localStorageKey) && JSON.parse(localStorage.getItem(localStorageKey));
+const setItemsLocalStorage = (value) => localStorage.setItem(localStorageKey, JSON.stringify(value));
 
+function App() {
   const [searchValue, setSearchValue] = useState('');
   const [activeItemId, setActiveItemId] = useState('');
   const [items, setItems] = useState(getItemsLocalStorage());
@@ -20,7 +20,6 @@ function App() {
     const firstItem = items[0];
     return (activeItem && activeItem.point) || (firstItem && firstItem.point) || moscowPoint;
   }, [items, activeItemId]);
-
 
   useEffect(() => {
     setItemsLocalStorage(items);
@@ -39,12 +38,12 @@ function App() {
       const point = await searchPoint(searchValue);
       if (point) {
         setItems(prevItems => [
+          ...prevItems,
           {
             id: uuid(),
             title: searchValue,
             point
-          },
-          ...prevItems
+          }
         ]);
         setSearchValue('');
       }
@@ -57,17 +56,40 @@ function App() {
 
   const onChangeActiveItem = useCallback((id) => setActiveItemId(id), []);
 
+  const reorder = (list, startIndex, endIndex) => {
+    const result = Array.from(list);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+    return result;
+  };
+
+  const onDragEnd = useCallback((result) => {
+    if (!result.destination) {
+      return;
+    }
+
+    if (result.destination.index === result.source.index) {
+      return;
+    }
+
+    setItems(prevItems => reorder(
+      prevItems,
+      result.source.index,
+      result.destination.index
+    ));
+  }, []);
+
   return <div className="container mt-5">
-          <div className="row">
-            <div className="col-sm">
-              <SearchForm value={searchValue} onChangeValue={onChangeSearchValue} onSubmit={onSubmit}/>
-              <List items={items} onRemove={onRemoveItem} onClick={onChangeActiveItem}/>
-            </div>
-            <div className="col-sm">
-              <Map centerPoint={centerPoint} items={items} onChangeItemPoint={onChangeItemPoint}/>
-            </div>
-          </div>
-        </div>;
+    <div className="row">
+      <div className="col-sm">
+        <SearchForm value={searchValue} onChangeValue={onChangeSearchValue} onSubmit={onSubmit}/>
+        <List items={items} onRemove={onRemoveItem} onClick={onChangeActiveItem} onDragEnd={onDragEnd}/>
+      </div>
+      <div className="col-sm">
+        <Map centerPoint={centerPoint} items={items} onChangeItemPoint={onChangeItemPoint}/>
+      </div>
+    </div>
+  </div>;
 }
 
 export default App;
