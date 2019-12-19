@@ -13,7 +13,7 @@ const setItemsLocalStorage = (value) => localStorage.setItem(localStorageKey, JS
 function App() {
   const [searchValue, setSearchValue] = useState('');
   const [activeItemId, setActiveItemId] = useState('');
-  const [items, setItems] = useState(getItemsLocalStorage());
+  const [items, setItems] = useState(getItemsLocalStorage() || []);
 
   const centerPoint = useMemo(() => {
     const activeItem = items.filter(item => item.id === activeItemId)[0];
@@ -79,7 +79,7 @@ function App() {
     ));
   }, []);
 
-  return <div className="container mt-5">
+  return <div className="container mt-5" data-testid="app">
     <div className="row">
       <div className="col-sm">
         <SearchForm value={searchValue} onChangeValue={onChangeSearchValue} onSubmit={onSubmit}/>
