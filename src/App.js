@@ -1,4 +1,5 @@
-import React, {useState, useMemo, useEffect, useCallback} from 'react';
+import React, {useState, useMemo, useCallback} from 'react';
+import {useLocalStorage} from 'react-use';
 import uuid from 'uuid/v1';
 import SearchForm from './components/SearchForm';
 import List from './components/List';
@@ -7,23 +8,17 @@ import {searchPoint} from './util';
 
 const moscowPoint = [55.75, 37.57];
 const localStorageKey = 'path-editor';
-const getItemsLocalStorage = () => localStorage.getItem(localStorageKey) && JSON.parse(localStorage.getItem(localStorageKey));
-const setItemsLocalStorage = (value) => localStorage.setItem(localStorageKey, JSON.stringify(value));
 
 function App() {
   const [searchValue, setSearchValue] = useState('');
   const [activeItemId, setActiveItemId] = useState('');
-  const [items, setItems] = useState(getItemsLocalStorage() || []);
+  const [items, setItems] = useLocalStorage(localStorageKey, [], false);
 
   const centerPoint = useMemo(() => {
     const activeItem = items.filter(item => item.id === activeItemId)[0];
     const firstItem = items[0];
     return (activeItem && activeItem.point) || (firstItem && firstItem.point) || moscowPoint;
   }, [items, activeItemId]);
-
-  useEffect(() => {
-    setItemsLocalStorage(items);
-  }, [items]);
 
   const onRemoveItem = useCallback((id) => {
     setItems(prevItems => prevItems.filter(item => item.id !== id));

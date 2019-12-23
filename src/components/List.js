@@ -14,6 +14,7 @@ let Item = (props) => {
                     }}>{title}</a>
 
                     <button type="button" 
+                            data-testid="remove-button"
                             className="btn btn-outline-danger btn-sm" 
                             onClick={() => onRemove(id)}>Удалить</button>
                 </div>

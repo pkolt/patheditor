@@ -3,11 +3,12 @@ import PropTypes from 'prop-types';
 
 const PointSearch = (props) => {
     const {value, onChangeValue, onSubmit} = props;
-    return <form onSubmit={(e) => {
+    return <form data-testid="search-form" onSubmit={(e) => {
                     e.preventDefault();
                     onSubmit();
                 }}>
-               <input className="form-control" 
+               <input data-testid="search-input"
+                      className="form-control" 
                       type="text" 
                       placeholder="Введите новую точку маршрута и нажмите Enter" 
                       value={value}
