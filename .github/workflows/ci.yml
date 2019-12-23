@@ -43,6 +43,6 @@ jobs:
     - name: npm install and deploy
       run: |
         npm install
-        npm deploy
+        npm run deploy
       env:
         CI: true
