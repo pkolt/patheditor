@@ -1,4 +1,4 @@
-# Path Editor
+# Path Editor ![](https://github.com/pkolt/patheditor/workflows/.github/workflows/ci.yml/badge.svg)
 
 [https://pkolt.github.io/patheditor](https://pkolt.github.io/patheditor)
 
