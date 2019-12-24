@@ -7,12 +7,11 @@ on:
 
 jobs:
   test:
-
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [12.x]
+        node-version: 12
 
     steps:
     - uses: actions/checkout@v1
@@ -21,8 +20,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - name: npm install and test
-      run: |
-        npm install
-        npm test
+    - run: npm ci
+    - run: npm test
       env:
         CI: true
